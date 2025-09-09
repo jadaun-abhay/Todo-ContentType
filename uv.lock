@@ -17,6 +17,8 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "django" },
+    { name = "django-cors-headers" },
+    { name = "django-sslserver-v2" },
     { name = "djangorestframework" },
     { name = "mysqlclient" },
 ]
@@ -24,6 +26,8 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "django", specifier = "==5.1" },
+    { name = "django-cors-headers", specifier = ">=4.8.0" },
+    { name = "django-sslserver-v2", specifier = ">=1.0" },
     { name = "djangorestframework", specifier = ">=3.16.1" },
     { name = "mysqlclient", specifier = ">=2.2.7" },
 ]
@@ -40,6 +44,31 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/1e/0c/d854d25bb74a8a3b41e642bbd27fe6af12fadd0edfd07d487809cf0ef719/Django-5.1.tar.gz", hash = "sha256:848a5980e8efb76eea70872fb0e4bc5e371619c70fffbe48e3e1b50b2c09455d", size = 10681050, upload-time = "2024-08-07T13:34:10.857Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/28/b4/110532cebfea2244d76119904da98c6fa045ebb202aee9ec7cbf36ea3cad/Django-5.1-py3-none-any.whl", hash = "sha256:d3b811bf5371a26def053d7ee42a9df1267ef7622323fe70a601936725aa4557", size = 8246099, upload-time = "2024-08-07T13:33:52.959Z" },
+]
+
+[[package]]
+name = "django-cors-headers"
+version = "4.8.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "asgiref" },
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/89/8e/6225441edcfe179bf4861e9e67489e33375e0b66316c8d7b9edaae863d37/django_cors_headers-4.8.0.tar.gz", hash = "sha256:0a12a2efcd59a3cea741e44db8ab589e929949de5bc4cdf35a29c6ae77297686", size = 21425, upload-time = "2025-09-08T15:58:05.34Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ac/b3/29ef49d6ff7800f323f3d98cde7777b3cfdda133de8feea84cffafea4578/django_cors_headers-4.8.0-py3-none-any.whl", hash = "sha256:3b883f4c6d07848673218456a5e070d8ab51f97341c1f27d0242ca167e7272ab", size = 12804, upload-time = "2025-09-08T15:58:03.882Z" },
+]
+
+[[package]]
+name = "django-sslserver-v2"
+version = "1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/73/5a/8161cba4e470f71d1bb4e793b9ccdb9570ea1c4f5da1c0860cb1b67333dc/django-sslserver-v2-1.0.tar.gz", hash = "sha256:4e1f84bc35a989bae25937ac017a6616ef04fdf99923cbba7b5c5dca27090f7c", size = 11175, upload-time = "2023-10-23T15:16:13.327Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/86/a0/bfc571b1905097af3c1c21d6a78f54fde50bfcb0495c21358bff7030cd21/django_sslserver_v2-1.0-py3-none-any.whl", hash = "sha256:9f2f191534e74fc1a1a40724fe4e5293815acb92016770f1393524e67bdcf340", size = 11902, upload-time = "2023-10-23T15:16:10.906Z" },
 ]
 
 [[package]]

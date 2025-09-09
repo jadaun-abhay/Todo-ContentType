@@ -10,3 +10,6 @@ wheels/
 .venv
 **/__pycache__/
 settings.py
+**/migrations/**
+!**/migrations/__init__.py
+db.sqlite3
