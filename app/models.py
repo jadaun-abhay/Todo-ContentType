@@ -35,12 +35,21 @@ class Task(BaseModel):
     )
 
 
+class TableInfo(BaseModel):
+    content_type = models.ForeignKey(ContentType, on_delete=models.DO_NOTHING)
+    object_id = models.PositiveBigIntegerField()
+    content_object = GenericForeignKey("content_type", "object_id")
+
+
 class Logs(BaseModel):
     old_value = models.TextField()
     new_value = models.TextField()
-    content_type = models.ForeignKey(ContentType, on_delete=models.DO_NOTHING)
-    object_id = models.PositiveBigIntegerField()
-    table = GenericForeignKey()
+    table_details = models.ForeignKey(
+        TableInfo,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="tables",
+    )
     user = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
