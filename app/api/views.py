@@ -1,14 +1,15 @@
 import base64
 
 from django.contrib.auth import authenticate, login, logout
+from django.forms.models import model_to_dict
 
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from app.enums import Status
-from app.models import User, Task
-from app.api.serializers import TaskSerializer
+from app.models import User, Task, TableInfo, Logs
+from app.api.serializers import TaskSerializer, LogSerializer
 
 # Write your views here
 
@@ -70,7 +71,7 @@ class AuthAV(APIView):
 
 class TodoAV(APIView):
     def get_instance(self, id):
-        return Task.objects.filter(id=id).first()
+        return Task.objects.filter(id=id, user_id=self.request.user.id).first()  # type: ignore
 
     def get(self, request):
         params = request.query_params
@@ -87,10 +88,26 @@ class TodoAV(APIView):
 
     def post(self, request):
         data = request.data
+        data["user_id"] = request.user.id
 
         serializer = TaskSerializer(data=data)
         if serializer.is_valid():
-            serializer.save()
+            instance = serializer.save()
+            new_value = model_to_dict(instance=instance)  # type: ignore
+
+            tf_instance = TableInfo(content_object=instance)
+            tf_instance.save()
+            data = {
+                "old_value": {},
+                "new_value": new_value,  # type: ignore
+                "table_details_id": tf_instance.id,  # type: ignore
+                "user_id": request.user.id,
+            }
+            log_serializer = LogSerializer(data=data)
+            if not log_serializer.is_valid():
+                return Response(log_serializer.errors, status=status.HTTP_200_OK)
+            log_serializer.save()
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
 
@@ -99,20 +116,78 @@ class TodoAV(APIView):
 
         id = data.get("id")
         instance = self.get_instance(id=id)
+        if instance is None:
+            response = {
+                "msg": "Either no tasks are defined or access denied.",
+            }
+            return Response(response, status=status.HTTP_409_CONFLICT)
+
+        old_value = model_to_dict(instance=instance)  # type: ignore
 
         serializer = TaskSerializer(instance, data=data)
         if serializer.is_valid():
-            serializer.save()
+            instance = serializer.save()
+            new_value = model_to_dict(instance=instance)  # type: ignore
+
+            tf_instance = TableInfo(content_object=instance)
+            tf_instance.save()
+
+            data = {
+                "old_value": old_value,
+                "new_value": new_value,  # type: ignore
+                "table_details_id": tf_instance.id,  # type: ignore
+                "user_id": request.user.id,
+            }
+            log_serializer = LogSerializer(data=data)
+            if not log_serializer.is_valid():
+                return Response(
+                    log_serializer.errors, status=status.HTTP_400_BAD_REQUEST
+                )
+            log_serializer.save()
+
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request):
         data = request.data
 
+        data.update(
+            {
+                "status": Status.DELETED,
+            }
+        )
+
         id = data.get("id")
         instance = self.get_instance(id=id)
+        if instance is None:
+            response = {
+                "msg": "No task found",
+            }
+            return Response(response, status=status.HTTP_409_CONFLICT)
+
+        old_value = model_to_dict(instance=instance)  # type: ignore
 
         serializer = TaskSerializer(instance, data=data)
         if serializer.is_valid():
-            serializer.save()
+            instance = serializer.save()
+            new_value = model_to_dict(instance=instance)  # type: ignore
+
+            tf_instance = TableInfo(content_object=instance)
+            tf_instance.save()
+
+            data = {
+                "old_value": old_value,
+                "new_value": new_value,
+                "table_details_id": tf_instance.id,  # type: ignore
+                "user_id": request.user.id,
+            }
+            log_serializer = LogSerializer(data=data)
+            if not log_serializer.is_valid():
+                return Response(
+                    log_serializer.errors,  # type: ignore
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            log_serializer.save()
+
             return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

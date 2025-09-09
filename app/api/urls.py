@@ -1,6 +1,6 @@
 from django.urls import path
 
-from app.api.views import AuthAV, SignUpAV
+from app.api.views import AuthAV, SignUpAV, TodoAV
 
 # Write your urls here
 
@@ -12,5 +12,9 @@ urlpatterns = [
     path(
         "auth/",
         AuthAV.as_view(),
+    ),
+    path(
+        "todo/",
+        TodoAV.as_view(),
     ),
 ]

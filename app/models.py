@@ -26,7 +26,7 @@ class User(BaseModel, AbstractUser):
 
 
 class Task(BaseModel):
-    description = models.TextField()
+    description = models.TextField(blank=True)
     user = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
@@ -42,8 +42,8 @@ class TableInfo(BaseModel):
 
 
 class Logs(BaseModel):
-    old_value = models.TextField()
-    new_value = models.TextField()
+    old_value = models.JSONField()
+    new_value = models.JSONField()
     table_details = models.ForeignKey(
         TableInfo,
         on_delete=models.SET_NULL,
