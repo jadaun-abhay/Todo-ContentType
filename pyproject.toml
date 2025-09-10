@@ -10,6 +10,7 @@ dependencies = [
     "django-sslserver-v2>=1.0",
     "djangorestframework>=3.16.1",
     "drf-spectacular>=0.28.0",
+    "mysql-connector-python>=9.4.0",
     "mysqlclient>=2.2.7",
     "python-dotenv>=1.1.1",
     "uuid6>=2025.0.1",
