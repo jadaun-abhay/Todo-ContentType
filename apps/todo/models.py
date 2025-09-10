@@ -3,8 +3,8 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
-from todo.enums import Status
-from todo.managers import DeleteStatusManager
+from apps.todo.enums import Status
+from apps.todo.managers import DeleteStatusManager
 
 # Create your models here.
 

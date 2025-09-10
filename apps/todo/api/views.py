@@ -7,9 +7,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from todo.enums import Status
-from todo.models import User, Task, TableInfo, Logs
-from todo.api.serializers import TaskSerializer, LogSerializer
+from apps.todo.enums import Status
+from apps.todo.models import User, Task, TableInfo, Logs
+from apps.todo.api.serializers import TaskSerializer, LogSerializer
 
 # Write your views here
 
