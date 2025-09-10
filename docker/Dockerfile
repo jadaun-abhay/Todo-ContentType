@@ -22,5 +22,3 @@ RUN uv venv
 
 RUN uv pip install -r pyproject.toml
 RUN uv pip install -e .
-
-EXPOSE 8000
