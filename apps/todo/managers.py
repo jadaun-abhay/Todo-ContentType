@@ -1,6 +1,6 @@
 from django.db import models
 
-from app.enums import Status
+from todo.enums import Status
 
 # Write your managers here
 

@@ -7,9 +7,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from app.enums import Status
-from app.models import User, Task, TableInfo, Logs
-from app.api.serializers import TaskSerializer, LogSerializer
+from todo.enums import Status
+from todo.models import User, Task, TableInfo, Logs
+from todo.api.serializers import TaskSerializer, LogSerializer
 
 # Write your views here
 
@@ -68,6 +68,13 @@ class AuthAV(APIView):
         }
         return Response(response, status=status.HTTP_401_UNAUTHORIZED)
 
+    def delete(self, request):
+        logout(request)
+        response = {
+            "msg": "Logout Successfull.",
+        }
+        return Response(response, status=status.HTTP_200_OK)
+
 
 class TodoAV(APIView):
     def get_instance(self, id):
@@ -103,7 +110,7 @@ class TodoAV(APIView):
                 "table_details_id": tf_instance.id,  # type: ignore
                 "user_id": request.user.id,
             }
-            log_serializer = LogSerializer(data=data)
+            log_serializer = LogSerializer(data=serializer.data)
             if not log_serializer.is_valid():
                 return Response(log_serializer.errors, status=status.HTTP_200_OK)
             log_serializer.save()
@@ -114,7 +121,7 @@ class TodoAV(APIView):
     def put(self, request):
         data = request.data
 
-        id = data.get("id")
+        id = data.pop("id")
         instance = self.get_instance(id=id)
         if instance is None:
             response = {
@@ -123,18 +130,32 @@ class TodoAV(APIView):
             return Response(response, status=status.HTTP_409_CONFLICT)
 
         old_value = model_to_dict(instance=instance)  # type: ignore
+        actual_old_value = {}
+        for each in data.keys():
+            actual_old_value[each] = old_value[each]
 
-        serializer = TaskSerializer(instance, data=data)
+        serializer = TaskSerializer(instance, data=data, partial=True)
+
         if serializer.is_valid():
             instance = serializer.save()
+            print("attr", dir(instance))
+            print(
+                "put",
+                serializer.data,
+                serializer.validated_data,
+                serializer.initial_data,
+            )
             new_value = model_to_dict(instance=instance)  # type: ignore
+            actual_new_value = {}
+            for each in data.keys():
+                actual_new_value[each] = new_value[each]
 
             tf_instance = TableInfo(content_object=instance)
             tf_instance.save()
 
             data = {
-                "old_value": old_value,
-                "new_value": new_value,  # type: ignore
+                "old_value": actual_old_value,
+                "new_value": actual_new_value,  # type: ignore
                 "table_details_id": tf_instance.id,  # type: ignore
                 "user_id": request.user.id,
             }
@@ -157,7 +178,7 @@ class TodoAV(APIView):
             }
         )
 
-        id = data.get("id")
+        id = data.pop("id")
         instance = self.get_instance(id=id)
         if instance is None:
             response = {
@@ -166,18 +187,24 @@ class TodoAV(APIView):
             return Response(response, status=status.HTTP_409_CONFLICT)
 
         old_value = model_to_dict(instance=instance)  # type: ignore
+        actual_old_value = {}
+        for each in data.keys():
+            actual_old_value[each] = old_value[each]
 
         serializer = TaskSerializer(instance, data=data)
         if serializer.is_valid():
             instance = serializer.save()
             new_value = model_to_dict(instance=instance)  # type: ignore
+            actual_new_value = {}
+            for each in data.keys():
+                actual_new_value[each] = new_value[each]
 
             tf_instance = TableInfo(content_object=instance)
             tf_instance.save()
 
             data = {
-                "old_value": old_value,
-                "new_value": new_value,
+                "old_value": actual_old_value,
+                "new_value": actual_new_value,
                 "table_details_id": tf_instance.id,  # type: ignore
                 "user_id": request.user.id,
             }

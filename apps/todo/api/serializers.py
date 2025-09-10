@@ -1,6 +1,8 @@
+from django.forms.models import model_to_dict
+
 from rest_framework import serializers
 
-from app.models import Task, User, Logs, TableInfo
+from todo.models import Task, User, Logs, TableInfo
 
 # Write your serializers here
 
@@ -29,3 +31,17 @@ class LogSerializer(serializers.ModelSerializer):
     class Meta:
         model = Logs
         fields = "__all__"
+
+    def update(self, instance, validated_data):
+        old_value = model_to_dict(instance=instance)
+        instance.description = validated_data.get("description", instance.description)
+        instance.status = validated_data.get("status", instance.status)
+        instance.save()
+        new_value = model_to_dict(instance=instance)
+
+        for field in new_value.keys():
+            if old_value.get(field) != new_value.get(field):
+                setattr(self, "new_dict", old_value.get(field))
+                setattr(self, "new_dict", new_value.get(field))
+
+        return instance

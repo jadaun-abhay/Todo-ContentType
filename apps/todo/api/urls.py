@@ -1,6 +1,6 @@
 from django.urls import path
 
-from app.api.views import AuthAV, SignUpAV, TodoAV
+from todo.api.views import AuthAV, SignUpAV, TodoAV
 
 # Write your urls here
 
