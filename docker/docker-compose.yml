@@ -1,0 +1,13 @@
+services:
+  dead_django:
+    build:
+      context: ../.
+      dockerfile: ./docker/Dockerfile
+    container_name: dead-django
+    restart: always
+    command: /bin/sh -c "while sleep 1000; do :; done;"
+    ports:
+    - "8000:8000"
+    volumes:
+    - ../.:/dead_task
+    
