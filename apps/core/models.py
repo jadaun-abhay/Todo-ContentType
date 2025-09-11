@@ -1,6 +1,6 @@
 import uuid6
 
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 
 from apps.core.choices import StatusChoices
@@ -15,8 +15,8 @@ class BaseModel(models.Model):
         choices=StatusChoices.choices,
         default=StatusChoices.CREATED,
     )
-    created_at = models.DateTimeField(auto_now=True)
-    updated_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     objects = DeleteChoiceManager()
 
@@ -31,3 +31,5 @@ class User(BaseModel, AbstractUser):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
+
+    objects = UserManager()

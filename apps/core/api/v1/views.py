@@ -1,12 +1,13 @@
 import base64
 
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout
 
 from rest_framework import status
+from rest_framework.response import Response
 
 from base.api.v1.views import BaseAV
 
-from apps.core.api.v1.serializers import UserSerializer
+from apps.core.api.v1.serializers import UserSerializer, AuthSerializer
 
 # Write your view here
 
@@ -15,6 +16,7 @@ class SignUp(BaseAV):
     authentication = False
 
     def post(self, request):
+        print("hello")
 
         data = request.data
 
@@ -23,8 +25,11 @@ class SignUp(BaseAV):
         )
         if serializer.is_valid():
             serializer.save()
-            self.success(response="Registration successfull !")
-        self.fail(response=serializer.errors)
+            response = {
+                "msg": "Registration Successful",
+            }
+            return Response(response, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AuthAV(BaseAV):
@@ -37,40 +42,50 @@ class AuthAV(BaseAV):
         decoded_credentials = base64.b64decode(value).decode("utf-8")
         credentials = decoded_credentials.split(":")
         return {
-            "username": credentials[0],
+            "email": credentials[0],
             "password": credentials[1],
         }
 
     def get(self, request):
-        self.success(
-            response=UserSerializer(
-                request.user,
-                fields=(
-                    "uuid",
-                    "email",
-                    "first_name",
-                    "last_name",
-                ).data,  # type: ignore
-            )
+        response = UserSerializer(
+            request.user,
+            fields=(
+                "uuid",
+                "email",
+                "first_name",
+                "last_name",
+            ).data,  # type: ignore
         )
+        return Response(response, status=status.HTTP_200_OK)
 
     def post(self, request):
         meta_data = request.META["HTTP_AUTHORIZATION"]
         credentials = self.decrypt_meta(meta=meta_data)
-        if credentials.get("username") and credentials.get("password"):
-            user = authenticate(request, **credentials)
-            if user is not None:
-                login(request, user)
-                self.success(response="Login Successfull !")
-            self.fail(
-                response="Invalid Credentials.",
-                status=status.HTTP_401_UNAUTHORIZED,
+        if credentials.get("email") and credentials.get("password"):
+            serializer = AuthSerializer(
+                data=credentials,
+                context={
+                    "request": request,
+                },
             )
-        self.fail(
-            response="Username or Password is not provided.",
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
+            if serializer.is_valid():
+                login(request, serializer.validated_data.get("user"))  # type: ignore
+                response = {
+                    "msg": "Login Successful !",
+                }
+                return Response(response, status=status.HTTP_200_OK)
+            response = {
+                "msg": "Invalid Credentials.",
+            }
+            return Response(response, status=status.HTTP_401_UNAUTHORIZED)
+        response = {
+            "msg": "Username or Password is not provided",
+        }
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request):
         logout(request)
-        self.success(response="Logout Successfull !")
+        response = {
+            "msg": "Logout successfull !",
+        }
+        return Response(response, status=status.HTTP_200_OK)

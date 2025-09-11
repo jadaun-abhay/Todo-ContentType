@@ -4,7 +4,7 @@ from apps.core.api.v1.views import SignUp, AuthAV
 
 # Write your urls here
 
-urlpatters = [
+urlpatterns = [
     path(
         "sign-up/",
         SignUp.as_view(),
